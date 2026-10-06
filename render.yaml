@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: test-wala
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OWNER_EMAIL
+        value: amankeshri7585@gmail.com
+      - key: OWNER_PASSWORD
+        sync: false
+    disk:
+      name: shiksha-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
