@@ -12,7 +12,62 @@ header{height:70px;background:#fff;display:flex;align-items:center;justify-conte
 .logo{font-weight:800;font-size:23px;color:#1769aa}.logo span{color:#20a884}
 nav{display:flex;gap:28px;font-size:14px;font-weight:600}nav a:hover{color:#1877d2}
 .play{background:#111;color:#fff;padding:10px 15px;border-radius:9px;font-size:11px;font-weight:700}
-.auth-buttons{display:flex;gap:8px;align-items:center}
+.auth-buttons{display:flex;gap:8px;align-items:center} 
+  .profile-wrap{
+  position:relative;
+  display:none;
+}
+
+.profile-btn{
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:50%;
+  background:#216bd7;
+  color:#fff;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.profile-menu{
+  display:none;
+  position:absolute;
+  right:0;
+  top:45px;
+  width:220px;
+  background:#fff;
+  border-radius:12px;
+  padding:14px;
+  box-shadow:0 8px 25px #0003;
+  z-index:100;
+}
+
+.profile-menu.show{
+  display:block;
+}
+
+.profile-menu h4{
+  margin:0 0 5px;
+  color:#173f6d;
+}
+
+.profile-menu p{
+  margin:0 0 12px;
+  font-size:12px;
+  color:#777;
+}
+
+.profile-menu button{
+  width:100%;
+  border:0;
+  padding:9px;
+  margin-top:6px;
+  border-radius:8px;
+  background:#216bd7;
+  color:#fff;
+  cursor:pointer;
+}
 .auth-btn{border:0;border-radius:20px;padding:10px 14px;font-size:11px;font-weight:800;cursor:pointer}
 .signin{background:#216bd7;color:#fff}.owner{background:#173f6d;color:#fff}
 .auth-btn:hover{opacity:.9}
@@ -220,7 +275,42 @@ function prevQuestion(){if(realIndex>0){realIndex--;renderRealQuestion()}}
 function nextQuestion(){if(realIndex<realQuestions.length-1){realIndex++;renderRealQuestion()}else finishRealTest()}
 async function finishRealTest(){clearInterval(realTimer);let score=0;realQuestions.forEach((q,i)=>{if(realAnswers[i]===q.correct)score++});try{await api('/results',{method:'POST',body:JSON.stringify({testId:realTest.id,score,total:realQuestions.length})})}catch(e){}document.getElementById('quizArea').style.display='none';document.getElementById('resultArea').style.display='block';document.getElementById('finalScore').textContent=score+'/'+realQuestions.length;document.getElementById('resultText').textContent=`आपका स्कोर ${score} है। Result database में save हो गया है।`}
 function closeTest(){clearInterval(realTimer);document.getElementById('testScreen').style.display='none'}
-function openLogin(){document.getElementById("login").style.display="flex"}function closeLogin(){document.getElementById("login").style.display="none"}
+function openLogin(){document.getElementById("login").style.display="flex"}function closeLogin(){document.getElementById("login").style.display="none"} 
+  function updateAuthUI(){
+  const signin=document.querySelector('.auth-btn.signin');
+  const owner=document.querySelector('.auth-btn.owner');
+  const profile=document.getElementById('profileWrap');
+
+  if(session && session.user && session.user.role!=='owner'){
+    signin.style.display='none';
+    owner.style.display='none';
+    profile.style.display='block';
+
+    document.getElementById('profileName').textContent =
+      session.user.name || 'Student';
+
+    document.getElementById('profileEmail').textContent =
+      session.user.email || '';
+
+    document.title='Test Wala — '+(session.user.name || 'Student');
+  }else{
+    signin.style.display='inline-block';
+    owner.style.display='inline-block';
+    profile.style.display='none';
+  }
+}
+
+function toggleProfileMenu(){
+  document.getElementById('profileMenu').classList.toggle('show');
+}
+
+function logoutUser(){
+  localStorage.removeItem('shikshaSession');
+  session=null;
+  document.getElementById('profileMenu').classList.remove('show');
+  updateAuthUI();
+  alert('Logout successful');
+}
 </script>
 <script>
 const API='';
