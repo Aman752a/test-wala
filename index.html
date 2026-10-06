@@ -310,7 +310,30 @@ function openLogin(){document.getElementById("login").style.display="flex"}funct
     profile.style.display='none';
   }
 }
+async function showMyResults(){
+  if(!session){
+    openAuth('signin');
+    return;
+  }
 
+  try{
+    const data = await api('/my-results');
+    const results = Array.isArray(data) ? data : (data.results || []);
+
+    if(!results.length){
+      alert('अभी कोई Result उपलब्ध नहीं है।');
+      return;
+    }
+
+    const text = results.map((r,i)=>{
+      return `${i+1}. ${r.test_name || r.test || 'Test'} — Score: ${r.score ?? '-'}`
+    }).join('\n');
+
+    alert('📊 My Results\n\n' + text);
+  }catch(e){
+    alert(e.message || 'Results लोड नहीं हो सके।');
+  }
+}
 function toggleProfileMenu(){
   document.getElementById('profileMenu').classList.toggle('show');
 }
