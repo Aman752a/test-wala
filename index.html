@@ -120,7 +120,18 @@ footer{background:#173f6d;color:#fff;text-align:center;padding:23px;font-size:13
   <nav><a href="#">Home</a><a href="#">Free Tools</a><a href="#">Online Computer Courses</a><a href="#">Latest Jobs</a></nav>
   <div class="auth-buttons">
   <button class="auth-btn signin" onclick="openAuth('signin')">Sign In / Login</button>
-  <button class="auth-btn owner" onclick="openAuth('owner')">Owner Login</button>
+  <button class="auth-btn owner" onclick="openAuth('owner')">Owner Login</button> 
+    <div class="profile-wrap" id="profileWrap">
+  <button class="profile-btn" id="profileBtn" onclick="toggleProfileMenu()">👤</button>
+
+  <div class="profile-menu" id="profileMenu">
+    <h4 id="profileName">Student</h4>
+    <p id="profileEmail"></p>
+
+    <button onclick="showMyResults()">📊 My Results</button>
+    <button onclick="logoutUser()">🚪 Logout</button>
+  </div>
+</div>
 </div>
 </header>
 
@@ -324,7 +335,6 @@ function showRegister(){authMode='register';document.getElementById('authTitle')
 async function realLogin(){const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;if(!email||!password){alert('Email और Password भरें।');return}try{const d=await api('/auth/login',{method:'POST',body:JSON.stringify({email,password})});session=d;localStorage.setItem('shikshaSession',JSON.stringify(d));closeAuth();alert('Login successful');updateAuthUI()}catch(e){alert(e.message)}}
 async function registerUser(){const name=document.getElementById('registerName').value.trim(),email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;if(!name){alert('अपना नाम दर्ज करें।');document.getElementById('registerName').focus();return}if(!email){alert('Email दर्ज करें।');document.getElementById('authEmail').focus();return}if(password.length<6){alert('Password कम से कम 6 characters का होना चाहिए।');document.getElementById('authPassword').focus();return}try{const d=await api('/auth/register',{method:'POST',body:JSON.stringify({name,email,password})});session=d;localStorage.setItem('shikshaSession',JSON.stringify(d));closeAuth();alert('Account created और login हो गया।');updateAuthUI()}catch(e){alert(e.message)}}
 async function ownerLogin(){const box=document.getElementById('ownerModal');const ins=box.querySelectorAll('input');try{const d=await api('/auth/login',{method:'POST',body:JSON.stringify({email:ins[0].value,password:ins[1].value})});if(d.user.role!=='owner')throw Error('Owner account required');session=d;localStorage.setItem('shikshaSession',JSON.stringify(d));closeAuth();document.getElementById('adminPanel').style.display='block';await refreshAdmin();}catch(e){alert(e.message)}}
-function updateAuthUI(){if(session){document.title='Test Wala — '+session.user.name}}
 async function loadLiveTests(){try{const tests=await api('/tests');const box=document.getElementById('liveTests');box.innerHTML=tests.length?tests.map(t=>`<div class="card"><span class="badge">${t.questions} Q</span><div class="book">TEST</div><h3>${escapeHtml(t.name)}</h3><small>${escapeHtml(t.subject||'General')} • ${t.time_minutes} min</small><br><button class="btn red" style="margin-top:10px;padding:8px 16px" onclick="startSpecificTest(${t.id})">Start Test</button></div>`).join(''):'<div class="card" style="grid-column:1/-1">अभी कोई online test नहीं है। Owner dashboard से test बनाएं।</div>';}catch(e){}}
 async function startSpecificTest(id){try{if(!session){openAuth('signin');alert('पहले Login / Sign Up करें।');return}const data=await api('/tests/'+id);if(!data.questions.length)throw Error('इस Test में अभी Questions नहीं हैं।');realTest=data;realQuestions=data.questions;realAnswers=new Array(realQuestions.length).fill(null);realIndex=0;document.getElementById('testScreen').style.display='block';document.getElementById('resultArea').style.display='none';document.getElementById('quizArea').style.display='block';realSeconds=(data.time_minutes||10)*60;clearInterval(realTimer);realTimer=setInterval(()=>{realSeconds--;renderTimer();if(realSeconds<=0){clearInterval(realTimer);finishRealTest()}},1000);renderTimer();renderRealQuestion()}catch(e){alert(e.message)}}
 async function refreshAdmin(){try{const s=await api('/admin/stats');document.querySelectorAll('.stat b')[0].textContent=s.tests;document.querySelectorAll('.stat b')[1].textContent=s.questions;document.querySelectorAll('.stat b')[2].textContent=s.users;document.querySelectorAll('.stat b')[3].textContent=s.results;const [tests,subs]=await Promise.all([api('/admin/tests'),api('/subjects')]);const sub=document.getElementById('newTestSubject');sub.innerHTML=subs.map(x=>`<option value="${x.id}">${escapeHtml(x.name)}</option>`).join('');const aq=document.getElementById('aqTest');aq.innerHTML='<option value="">Select Test</option>'+tests.map(x=>`<option value="${x.id}">${escapeHtml(x.name)}</option>`).join('');document.getElementById('adminTestList').innerHTML=tests.map(x=>`<div class="manager-item"><div><b>${escapeHtml(x.name)}</b><br><small>${escapeHtml(x.subject||'General')} • ${x.time_minutes} min • ${x.questions} questions</small></div></div>`).join('')||'<small>No tests yet.</small>';document.getElementById('testList').innerHTML=document.getElementById('adminTestList').innerHTML;}catch(e){alert(e.message)}}
