@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Wala — Online Mock Test Platform</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#f5f9ff;color:#172033}
+a{text-decoration:none;color:inherit}
+header{height:70px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 5%;box-shadow:0 2px 10px #00000012;position:sticky;top:0;z-index:10}
+.logo{font-weight:800;font-size:23px;color:#1769aa}.logo span{color:#20a884}
+nav{display:flex;gap:28px;font-size:14px;font-weight:600}nav a:hover{color:#1877d2}
+.play{background:#111;color:#fff;padding:10px 15px;border-radius:9px;font-size:11px;font-weight:700}
+.auth-buttons{display:flex;gap:8px;align-items:center}
+.auth-btn{border:0;border-radius:20px;padding:10px 14px;font-size:11px;font-weight:800;cursor:pointer}
+.signin{background:#216bd7;color:#fff}.owner{background:#173f6d;color:#fff}
+.auth-btn:hover{opacity:.9}
+@media(max-width:800px){.auth-buttons{gap:5px}.auth-btn{padding:8px 9px;font-size:10px}}
+
+.container{max-width:1200px;margin:auto;padding:0 22px}
+.hero{margin:0 auto;padding:42px 42px 48px;background:linear-gradient(135deg,#087dcc,#1a9be4);border-radius:0 0 35px 35px;color:#fff;display:flex;align-items:center;justify-content:space-between;overflow:hidden}
+.hero h1{font:italic 700 48px Georgia,serif;line-height:1.05}.hero h1 em{color:#ffe33b}.hero p{margin:22px 0;color:#e7f5ff}.pills{display:flex;gap:10px;flex-wrap:wrap}.pill{border:1px solid #ffffff55;border-radius:20px;padding:8px 13px;font-size:12px}
+.buttons{margin-top:25px;display:flex;gap:12px}.btn{border:0;border-radius:25px;padding:13px 24px;font-weight:800;cursor:pointer}.red{background:#ff565c;color:#fff}.yellow{background:#ffbd18;color:#fff}
+.illustration{width:42%;min-width:310px;height:230px;border-radius:45% 55% 50% 45%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:70px;box-shadow:0 15px 35px #005da633}
+.section-title{text-align:center;margin:42px 0 28px}.section-title h2{font:italic 700 31px Georgia,serif;color:#1f5c86}.section-title p{color:#89919b;margin-top:7px;font-size:13px}
+.books{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:#fff;border:1px solid #e4eaf2;border-radius:10px;min-height:138px;padding:20px 10px;text-align:center;box-shadow:0 3px 10px #183b5c0b;position:relative;cursor:pointer;transition:.2s}.card:hover{transform:translateY(-3px);box-shadow:0 8px 20px #183b5c18}
+.badge{position:absolute;right:0;top:0;background:#f5b900;color:#fff;font-size:10px;padding:5px 8px;border-radius:0 8px 0 8px}
+.book{width:38px;height:50px;margin:2px auto 10px;border-radius:2px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;font-weight:800;box-shadow:3px 4px 8px #0002;background:linear-gradient(135deg,#347bb0,#173f67)}
+.card:nth-child(2) .book{background:linear-gradient(135deg,#c14d3b,#7b1e18)}.card:nth-child(3) .book{background:linear-gradient(135deg,#71ad75,#28613b)}.card:nth-child(4) .book{background:linear-gradient(135deg,#344e63,#17242e)}
+.card:nth-child(5) .book{background:linear-gradient(135deg,#dfb27b,#9b6233)}.card:nth-child(6) .book{background:linear-gradient(135deg,#7eaf76,#39743a)}.card:nth-child(7) .book{background:linear-gradient(135deg,#cb6748,#87351f)}.card:nth-child(8) .book{background:linear-gradient(135deg,#5ba3ca,#27648a)}
+.card h3{font:600 13px Georgia,serif}.card small{display:block;color:#999;font-style:italic;margin-top:5px;font-size:11px}
+.form{margin:45px 0 48px;background:#fff;border-radius:13px;padding:22px;box-shadow:0 5px 20px #1a4d7a10;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end}.field label{font-size:10px;font-weight:700;display:block;margin-bottom:8px}.field select{width:100%;height:40px;border:1px solid #dfe5ed;border-radius:7px;padding:0 10px;color:#777;background:#fff}.start{height:40px;border:0;border-radius:22px;background:#2c68d8;color:#fff;font-weight:800;padding:0 23px;cursor:pointer}
+footer{background:#173f6d;color:#fff;text-align:center;padding:23px;font-size:13px}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:center;justify-content:center}.modal-box{background:#fff;border-radius:14px;padding:28px;width:min(430px,90%)}.modal-box input{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:7px}.modal-box button{width:100%;padding:12px;border:0;border-radius:7px;background:#206bd4;color:#fff;font-weight:700}
+@media(max-width:800px){nav{display:none}.hero{padding:30px 22px}.hero h1{font-size:35px}.illustration{display:none}.books{grid-template-columns:repeat(2,1fr)}.form{grid-template-columns:1fr}.start{width:100%}}
+
+.admin-panel{display:none;position:fixed;inset:0;background:#f4f7fb;z-index:30;overflow:auto}
+.admin-top{background:#173f6d;color:#fff;padding:18px 5%;display:flex;justify-content:space-between;align-items:center}
+.admin-top button{background:#fff;color:#173f6d;border:0;border-radius:18px;padding:8px 15px;font-weight:700}
+.admin-wrap{max-width:1100px;margin:25px auto;padding:0 20px}
+.admin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:25px}
+.stat{background:#fff;border-radius:12px;padding:20px;box-shadow:0 3px 12px #0001}.stat b{font-size:26px;color:#216bd7;display:block;margin-top:7px}
+.admin-card{background:#fff;border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:0 3px 12px #0001}
+.admin-card input,.admin-card select{padding:11px;border:1px solid #ddd;border-radius:7px;margin:5px;width:calc(50% - 14px)}
+.admin-card button{padding:11px 18px;border:0;border-radius:7px;background:#216bd7;color:#fff;font-weight:700;margin:5px;cursor:pointer}
+@media(max-width:800px){.admin-grid{grid-template-columns:repeat(2,1fr)}.admin-card input,.admin-card select{width:100%;margin:5px 0}}
+
+.test-screen{display:none;position:fixed;inset:0;background:#f5f8fc;z-index:40;overflow:auto}
+.test-head{background:#173f6d;color:#fff;padding:13px 4%;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2}
+.timer{background:#ff5252;padding:9px 15px;border-radius:20px;font-weight:800}
+.test-wrap{max-width:950px;margin:22px auto;padding:0 18px}
+.progress{height:8px;background:#dde5ef;border-radius:10px;overflow:hidden;margin:12px 0 22px}.progress i{display:block;height:100%;background:#216bd7;width:0}
+.q-card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 4px 18px #0001}.q-number{color:#216bd7;font-weight:800;margin-bottom:12px}.question{font-size:19px;font-weight:700;line-height:1.5;margin-bottom:20px}
+.options{display:grid;gap:11px}.option{padding:14px;border:1px solid #dce3eb;border-radius:9px;cursor:pointer;background:#fff}.option:hover{border-color:#216bd7;background:#f3f7ff}.option.selected{border-color:#216bd7;background:#eaf2ff}.option.correct{border-color:#1a9b62;background:#eafaf3}.option.wrong{border-color:#e34b4b;background:#fff0f0}
+.test-actions{display:flex;justify-content:space-between;gap:10px;margin-top:22px}.test-actions button{border:0;border-radius:8px;padding:12px 20px;font-weight:800;cursor:pointer}.prev{background:#e8edf3}.next{background:#216bd7;color:#fff}
+.result-card{max-width:550px;margin:50px auto;background:#fff;border-radius:18px;padding:35px;text-align:center;box-shadow:0 5px 25px #0001}.score{font-size:55px;font-weight:900;color:#216bd7;margin:12px}
+.result-card button{border:0;background:#216bd7;color:#fff;padding:12px 25px;border-radius:8px;font-weight:800}
+.manager-list{margin-top:15px;border-top:1px solid #e8edf3}.manager-item{padding:12px 0;border-bottom:1px solid #e8edf3;display:flex;justify-content:space-between;gap:10px;align-items:center}.manager-item small{color:#777}.danger{background:#e34b4b!important}.admin-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.admin-nav button{border:1px solid #dbe3ee;background:#fff;color:#173f6d;border-radius:8px;padding:9px 13px;font-weight:700}.admin-nav button.active{background:#216bd7;color:#fff}</style>
+</head>
+<body>
+<header>
+  <div class="logo">✣ Test Wala</div>
+  <nav><a href="#">Home</a><a href="#">Free Tools</a><a href="#">Online Computer Courses</a><a href="#">Latest Jobs</a></nav>
+  <div class="auth-buttons">
+  <button class="auth-btn signin" onclick="openAuth('signin')">Sign In / Login</button>
+  <button class="auth-btn owner" onclick="openAuth('owner')">Owner Login</button>
+</div>
+</header>
+
+<main class="container">
+<section class="hero">
+  <div>
+    <h1>Practice Smart<br><em>Perform Better</em></h1>
+    <div class="pills"><span class="pill">◉ Anytime CBT</span><span class="pill">✦ Live Analytics</span><span class="pill">◎ High Accuracy</span></div>
+    <div class="buttons"><button class="btn red" onclick="openAuth('signin')">Start Test →</button><button class="btn yellow">Lucent Test ↗</button></div>
+  </div>
+  <div class="illustration">👩‍💻 👨‍🎓 💻<br>📊</div>
+</section>
+
+<section>
+<div class="section-title"><h2>Select Book For Mock Test</h2><p>Choose your exam category to load the database instantly.</p></div>
+<div class="books" id="books"></div>
+</section>
+
+<section class="form">
+ <div class="field"><label>Select Category</label><select id="cat"><option>Select Category</option><option>Lucent</option><option>Computer</option><option>Railway</option><option>Current Affairs</option><option>10th/12th</option></select></div>
+ <div class="field"><label>Select Subject</label><select><option>-- Choose Subject --</option><option>History</option><option>Geography</option><option>Polity</option><option>Science</option></select></div>
+ <div class="field"><label>Select Topic</label><select><option>-- Choose Topic --</option><option>Chapter Wise</option><option>Mixed Test</option></select></div>
+ <button class="start" onclick="startTest()">▶ START TEST</button>
+</section>
+</main>
+<footer>© 2026 TestWala — Online Mock Test Platform</footer>
+
+<div class="modal" id="signinModal"><div class="modal-box">
+<h2 id="authTitle">Sign In / Login</h2>
+<div id="registerNameWrap" style="display:none">
+<label style="display:block;font-size:12px;font-weight:700;margin-top:8px">Full Name</label>
+<input id="registerName" placeholder="अपना पूरा नाम दर्ज करें" autocomplete="name">
+</div>
+<label style="display:block;font-size:12px;font-weight:700;margin-top:8px">Email</label>
+<input id="authEmail" type="email" placeholder="Email address" autocomplete="email">
+<label style="display:block;font-size:12px;font-weight:700;margin-top:8px">Password</label>
+<input id="authPassword" type="password" placeholder="Password" autocomplete="current-password">
+<button id="authSubmit" onclick="realLogin()">Login</button>
+<button id="registerToggle" style="margin-top:8px;background:#eef4ff;color:#216bd7" onclick="showRegister()">Create New Account</button>
+<p id="authHint" style="text-align:center;margin-top:12px;font-size:12px;color:#777">New user? Create an account first.</p>
+<p style="text-align:center;margin-top:10px;font-size:12px;color:#777;cursor:pointer" onclick="closeAuth()">Close</p>
+</div></div>
+
+<div class="modal" id="ownerModal"><div class="modal-box">
+<h2>Owner Login</h2>
+<p style="font-size:12px;color:#777;margin:7px 0 12px">Only website owner/admin can access this panel.</p>
+<input placeholder="Owner Email / Username">
+<input type="password" placeholder="Owner Password">
+<button onclick="ownerLogin()">Owner Login</button>
+<p style="text-align:center;margin-top:12px;font-size:12px;color:#777;cursor:pointer" onclick="closeAuth()">Close</p>
+</div></div>
+
+
+
+<section class="container" style="padding-bottom:35px">
+  <div class="section-title"><h2>Available Online Tests</h2><p>Live tests created by the owner appear here.</p></div>
+  <div id="liveTests" class="books"></div>
+</section>
+
+<div class="test-screen" id="testScreen">
+  <div class="test-head">
+    <strong>Test Wala — Mock Test</strong>
+    <div class="timer" id="timer">10:00</div>
+  </div>
+  <div class="test-wrap" id="quizArea">
+    <div style="display:flex;justify-content:space-between"><b id="qCount">Question 1 of 10</b><span id="answered">0 Answered</span></div>
+    <div class="progress"><i id="progressBar"></i></div>
+    <div class="q-card">
+      <div class="q-number" id="qNo">Question 1</div>
+      <div class="question" id="questionText"></div>
+      <div class="options" id="options"></div>
+      <div class="test-actions">
+        <button class="prev" onclick="prevQuestion()">← Previous</button>
+        <button class="next" id="nextBtn" onclick="nextQuestion()">Next →</button>
+      </div>
+    </div>
+  </div>
+  <div id="resultArea" style="display:none" class="test-wrap">
+    <div class="result-card">
+      <h2>🎉 Test Completed</h2>
+      <div class="score" id="finalScore">0/10</div>
+      <p id="resultText"></p>
+      <br><button onclick="closeTest()">Back to Home</button>
+    </div>
+  </div>
+</div>
+
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-top"><strong>👑 Test Wala — Owner Dashboard</strong><button onclick="closeAdmin()">Logout</button></div>
+  <div class="admin-wrap">
+    <h2 style="margin-bottom:18px">Dashboard</h2>
+    <div class="admin-grid">
+      <div class="stat">Total Tests<b>128</b></div>
+      <div class="stat">Questions<b>2,450</b></div>
+      <div class="stat">Students<b>856</b></div>
+      <div class="stat">Results<b>1,932</b></div>
+    </div>
+    <div class="admin-card">
+      <h3>Create Test</h3>
+      <input placeholder="Test Name" id="newTestName">
+      <select id="newTestSubject"></select>
+      <input placeholder="Time (minutes)" type="number" id="newTestTime" value="10" min="1">
+      <button onclick="createTest()">+ Create Test</button>
+      <div class="manager-list" id="adminTestList"></div>
+    </div>
+    <div class="admin-card">
+<div class="admin-nav"><button class="active" onclick="showManager('questions',this)">📚 Questions</button><button onclick="showManager('tests',this)">📝 Tests</button><button onclick="showManager('subjects',this)">📖 Subjects</button></div>
+<div id="managerQuestions"><h3>Add Question</h3><select id="aqTest"><option value="">Select Test</option></select><select id="aqSubject"><option>General Knowledge</option><option>History</option><option>Geography</option><option>Polity</option><option>Science</option><option>Computer</option></select><input id="aqTopic" placeholder="Topic"><input id="aqText" placeholder="Question"><input id="aqA" placeholder="Option A"><input id="aqB" placeholder="Option B"><input id="aqC" placeholder="Option C"><input id="aqD" placeholder="Option D"><select id="aqCorrect"><option value="0">Correct: A</option><option value="1">Correct: B</option><option value="2">Correct: C</option><option value="3">Correct: D</option></select><button onclick="addQuestion()">+ Add Question</button><div class="manager-list" id="questionList"></div></div>
+<div id="managerTests" style="display:none"><h3>Create Test</h3><div class="manager-list" id="testList"></div></div>
+<div id="managerSubjects" style="display:none"><h3>Subjects</h3><input id="newSubject" placeholder="New Subject"><button onclick="addSubject()">+ Add Subject</button><div class="manager-list" id="subjectList"></div></div></div>
+  </div>
+</div>
+
+<script>
+const books=[
+["Computer Tests","All Computer Course","Active"],["Super TET 2","All Objective Question Answer","Popular"],
+["Lucent Subject Wise","Lucent Book Subject Wise Test","Popular"],["Lucent Tonic Wise","Lucent Book Point Wise Test","New"],
+["Speedy Book","Railway & SSC","New"],["Lucent Objective Book","Lucent Subject Wise Test","Popular"],
+["Previous Practice Set","Railway (NTPC + Group D)","Popular"],["Speedy August 2026","Current Affairs","New"],
+["Speedy September 2026","Current Affairs","Popular"],["Gyan Bindu","General Knowledge",""],
+["Bihar Board","All 10th/12th Subject","10th/12th"],["UP Board","All 10th/12th Subject","10th/12th"],
+["Bihar Special GK","Full Bihar GK Test","New"]];
+const box=document.getElementById("books");
+books.forEach((b,i)=>box.innerHTML+=`<div class="card" onclick="selectBook('${b[0]}')"><span class="badge">${b[2]}</span><div class="book">${b[0].split(" ").slice(0,2).join(" ")}</div><h3>${b[0]}</h3><small>${b[1]}</small></div>`);
+function selectBook(n){document.getElementById("cat").value="Lucent";alert(n+" selected. अब Subject और Topic चुनकर Start Test दबाएँ।")}
+let bank=JSON.parse(localStorage.getItem('testWalaQuestions')||'[]'),tests=JSON.parse(localStorage.getItem('testWalaTests')||'[]'),subjects=JSON.parse(localStorage.getItem('testWalaSubjects')||'["General Knowledge","History","Geography","Polity","Science","Computer"]');
+function showManager(t,b){['questions','tests','subjects'].forEach(x=>document.getElementById('manager'+x[0].toUpperCase()+x.slice(1)).style.display='none');document.getElementById('manager'+t[0].toUpperCase()+t.slice(1)).style.display='block';document.querySelectorAll('.admin-nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderManagers()}
+function addQuestion(){let q=document.getElementById('aqText').value.trim(),o=['aqA','aqB','aqC','aqD'].map(x=>document.getElementById(x).value.trim());if(!q||o.some(x=>!x)){alert('Question और चारों options भरें।');return}bank.push({q,o,a:+document.getElementById('aqCorrect').value,subject:document.getElementById('aqSubject').value,topic:document.getElementById('aqTopic').value});localStorage.setItem('testWalaQuestions',JSON.stringify(bank));renderManagers();alert('Question added!')}
+function deleteQuestion(i){bank.splice(i,1);localStorage.setItem('testWalaQuestions',JSON.stringify(bank));renderManagers()}
+function createTest(){let n=document.getElementById('newTestName').value.trim(),t=+document.getElementById('newTestTime').value||10;if(!n)return alert('Test Name डालें।');tests.push({name:n,time:t,questions:bank.length});localStorage.setItem('testWalaTests',JSON.stringify(tests));renderManagers();alert('Test created!')}
+function addSubject(){let s=document.getElementById('newSubject').value.trim();if(s&&!subjects.includes(s)){subjects.push(s);localStorage.setItem('testWalaSubjects',JSON.stringify(subjects));renderManagers()}}
+function renderManagers(){let q=document.getElementById('questionList');if(q)q.innerHTML=bank.length?bank.map((x,i)=>`<div class="manager-item"><div><b>${i+1}. ${x.q}</b><br><small>${x.subject} • ${x.topic||'General'}</small></div><button class="danger" onclick="deleteQuestion(${i})">Delete</button></div>`).join(''):'<small>No custom questions yet.</small>';let t=document.getElementById('testList');if(t)t.innerHTML=tests.map(x=>`<div class="manager-item"><b>${x.name}</b><small>${x.time} min • ${x.questions} questions</small></div>`).join('')||'<small>No tests created yet.</small>';let s=document.getElementById('subjectList');if(s)s.innerHTML=subjects.map(x=>`<div class="manager-item"><b>${x}</b></div>`).join('')}
+let realTest=null,realQuestions=[],realAnswers=[],realIndex=0,realTimer=null,realSeconds=0;
+async function startTest(){
+  try{
+    if(!session) { openAuth('signin'); alert('पहले Login / Sign Up करें।'); return; }
+    const list=await api('/tests');
+    if(!list.length) throw Error('अभी कोई Test उपलब्ध नहीं है। Owner पहले Test और Questions बनाए।');
+    const chosen=list[0];
+    const data=await api('/tests/'+chosen.id);
+    if(!data.questions.length) throw Error('इस Test में अभी Questions नहीं हैं।');
+    realTest=data; realQuestions=data.questions; realAnswers=new Array(realQuestions.length).fill(null); realIndex=0;
+    document.getElementById('testScreen').style.display='block'; document.getElementById('resultArea').style.display='none'; document.getElementById('quizArea').style.display='block';
+    realSeconds=(data.time_minutes||10)*60; clearInterval(realTimer); realTimer=setInterval(()=>{realSeconds--;renderTimer();if(realSeconds<=0){clearInterval(realTimer);finishRealTest();}},1000); renderTimer(); renderRealQuestion();
+  }catch(e){alert(e.message)}
+}
+function renderTimer(){const m=Math.floor(realSeconds/60),s=realSeconds%60;document.getElementById('timer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+function renderRealQuestion(){const q=realQuestions[realIndex];document.getElementById('qCount').textContent=`Question ${realIndex+1} of ${realQuestions.length}`;document.getElementById('answered').textContent=realAnswers.filter(x=>x!==null).length+' Answered';document.getElementById('progressBar').style.width=((realIndex+1)/realQuestions.length*100)+'%';document.getElementById('qNo').textContent='Question '+(realIndex+1);document.getElementById('questionText').textContent=q.question;const labels=['A','B','C','D'],vals=[q.a,q.b,q.c,q.d];document.getElementById('options').innerHTML=vals.map((v,i)=>`<div class="option ${realAnswers[realIndex]===i?'selected':''}" onclick="selectRealAnswer(${i})"><b>${labels[i]}.</b> ${escapeHtml(v)}</div>`).join('');document.getElementById('nextBtn').textContent=realIndex===realQuestions.length-1?'Submit Test':'Next →'}
+function escapeHtml(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function selectRealAnswer(i){realAnswers[realIndex]=i;renderRealQuestion()}
+function prevQuestion(){if(realIndex>0){realIndex--;renderRealQuestion()}}
+function nextQuestion(){if(realIndex<realQuestions.length-1){realIndex++;renderRealQuestion()}else finishRealTest()}
+async function finishRealTest(){clearInterval(realTimer);let score=0;realQuestions.forEach((q,i)=>{if(realAnswers[i]===q.correct)score++});try{await api('/results',{method:'POST',body:JSON.stringify({testId:realTest.id,score,total:realQuestions.length})})}catch(e){}document.getElementById('quizArea').style.display='none';document.getElementById('resultArea').style.display='block';document.getElementById('finalScore').textContent=score+'/'+realQuestions.length;document.getElementById('resultText').textContent=`आपका स्कोर ${score} है। Result database में save हो गया है।`}
+function closeTest(){clearInterval(realTimer);document.getElementById('testScreen').style.display='none'}
+function openLogin(){document.getElementById("login").style.display="flex"}function closeLogin(){document.getElementById("login").style.display="none"}
+</script>
+<script>
+const API='';
+let session=JSON.parse(localStorage.getItem('shikshaSession')||'null');
+async function api(path,opts={}){opts.headers={...(opts.headers||{}),'Content-Type':'application/json',...(session?{Authorization:'Bearer '+session.token}:{})};const r=await fetch('/api'+path,opts);const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||'Request failed');return d}
+let authMode='login';
+function openAuth(type){closeAuth();const id=type==='owner'?'ownerModal':'signinModal';document.getElementById(id).style.display='flex';if(type!=='owner')showLogin()}
+function closeAuth(){document.querySelectorAll('.modal').forEach(x=>x.style.display='none')}
+function showLogin(){authMode='login';document.getElementById('authTitle').textContent='Sign In / Login';document.getElementById('registerNameWrap').style.display='none';document.getElementById('authSubmit').textContent='Login';document.getElementById('authSubmit').onclick=realLogin;document.getElementById('registerToggle').textContent='Create New Account';document.getElementById('registerToggle').onclick=showRegister;document.getElementById('authHint').textContent='New user? Create an account first.';document.getElementById('authPassword').autocomplete='current-password'}
+function showRegister(){authMode='register';document.getElementById('authTitle').textContent='Create New Account';document.getElementById('registerNameWrap').style.display='block';document.getElementById('authSubmit').textContent='Create Account';document.getElementById('authSubmit').onclick=registerUser;document.getElementById('registerToggle').textContent='Already have an account? Login';document.getElementById('registerToggle').onclick=showLogin;document.getElementById('authHint').textContent='Name, email और password भरकर account बनाएं।';document.getElementById('authPassword').autocomplete='new-password';document.getElementById('registerName').focus()}
+async function realLogin(){const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;if(!email||!password){alert('Email और Password भरें।');return}try{const d=await api('/auth/login',{method:'POST',body:JSON.stringify({email,password})});session=d;localStorage.setItem('shikshaSession',JSON.stringify(d));closeAuth();alert('Login successful');updateAuthUI()}catch(e){alert(e.message)}}
+async function registerUser(){const name=document.getElementById('registerName').value.trim(),email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;if(!name){alert('अपना नाम दर्ज करें।');document.getElementById('registerName').focus();return}if(!email){alert('Email दर्ज करें।');document.getElementById('authEmail').focus();return}if(password.length<6){alert('Password कम से कम 6 characters का होना चाहिए।');document.getElementById('authPassword').focus();return}try{const d=await api('/auth/register',{method:'POST',body:JSON.stringify({name,email,password})});session=d;localStorage.setItem('shikshaSession',JSON.stringify(d));closeAuth();alert('Account created और login हो गया।');updateAuthUI()}catch(e){alert(e.message)}}
+async function ownerLogin(){const box=document.getElementById('ownerModal');const ins=box.querySelectorAll('input');try{const d=await api('/auth/login',{method:'POST',body:JSON.stringify({email:ins[0].value,password:ins[1].value})});if(d.user.role!=='owner')throw Error('Owner account required');session=d;localStorage.setItem('shikshaSession',JSON.stringify(d));closeAuth();document.getElementById('adminPanel').style.display='block';await refreshAdmin();}catch(e){alert(e.message)}}
+function updateAuthUI(){if(session){document.title='Test Wala — '+session.user.name}}
+async function loadLiveTests(){try{const tests=await api('/tests');const box=document.getElementById('liveTests');box.innerHTML=tests.length?tests.map(t=>`<div class="card"><span class="badge">${t.questions} Q</span><div class="book">TEST</div><h3>${escapeHtml(t.name)}</h3><small>${escapeHtml(t.subject||'General')} • ${t.time_minutes} min</small><br><button class="btn red" style="margin-top:10px;padding:8px 16px" onclick="startSpecificTest(${t.id})">Start Test</button></div>`).join(''):'<div class="card" style="grid-column:1/-1">अभी कोई online test नहीं है। Owner dashboard से test बनाएं।</div>';}catch(e){}}
+async function startSpecificTest(id){try{if(!session){openAuth('signin');alert('पहले Login / Sign Up करें।');return}const data=await api('/tests/'+id);if(!data.questions.length)throw Error('इस Test में अभी Questions नहीं हैं।');realTest=data;realQuestions=data.questions;realAnswers=new Array(realQuestions.length).fill(null);realIndex=0;document.getElementById('testScreen').style.display='block';document.getElementById('resultArea').style.display='none';document.getElementById('quizArea').style.display='block';realSeconds=(data.time_minutes||10)*60;clearInterval(realTimer);realTimer=setInterval(()=>{realSeconds--;renderTimer();if(realSeconds<=0){clearInterval(realTimer);finishRealTest()}},1000);renderTimer();renderRealQuestion()}catch(e){alert(e.message)}}
+async function refreshAdmin(){try{const s=await api('/admin/stats');document.querySelectorAll('.stat b')[0].textContent=s.tests;document.querySelectorAll('.stat b')[1].textContent=s.questions;document.querySelectorAll('.stat b')[2].textContent=s.users;document.querySelectorAll('.stat b')[3].textContent=s.results;const [tests,subs]=await Promise.all([api('/admin/tests'),api('/subjects')]);const sub=document.getElementById('newTestSubject');sub.innerHTML=subs.map(x=>`<option value="${x.id}">${escapeHtml(x.name)}</option>`).join('');const aq=document.getElementById('aqTest');aq.innerHTML='<option value="">Select Test</option>'+tests.map(x=>`<option value="${x.id}">${escapeHtml(x.name)}</option>`).join('');document.getElementById('adminTestList').innerHTML=tests.map(x=>`<div class="manager-item"><div><b>${escapeHtml(x.name)}</b><br><small>${escapeHtml(x.subject||'General')} • ${x.time_minutes} min • ${x.questions} questions</small></div></div>`).join('')||'<small>No tests yet.</small>';document.getElementById('testList').innerHTML=document.getElementById('adminTestList').innerHTML;}catch(e){alert(e.message)}}
+async function addQuestion(){try{const q=document.getElementById('aqText').value.trim(),o=['aqA','aqB','aqC','aqD'].map(x=>document.getElementById(x).value.trim()),testId=+document.getElementById('aqTest').value;if(!testId)throw Error('पहले Test select करें।');if(!q||o.some(x=>!x))throw Error('Question और चारों options भरें।');await api('/admin/questions',{method:'POST',body:JSON.stringify({testId,subjectId:null,topic:document.getElementById('aqTopic').value,question:q,a:o[0],b:o[1],c:o[2],d:o[3],correct:+document.getElementById('aqCorrect').value})});alert('Question database में save हो गया।');['aqText','aqA','aqB','aqC','aqD','aqTopic'].forEach(id=>document.getElementById(id).value='');await refreshAdmin();loadLiveTests()}catch(e){alert(e.message)}}
+async function createTest(){try{const n=document.getElementById('newTestName').value.trim(),t=+document.getElementById('newTestTime').value||10,subjectId=+document.getElementById('newTestSubject').value||null;if(!n)throw Error('Test Name डालें।');await api('/admin/tests',{method:'POST',body:JSON.stringify({name:n,subjectId,timeMinutes:t})});document.getElementById('newTestName').value='';alert('Test database में save हो गया।');await refreshAdmin();loadLiveTests()}catch(e){alert(e.message)}}
+async function addSubject(){try{const n=document.getElementById('newSubject').value.trim();if(!n)return;await api('/admin/subjects',{method:'POST',body:JSON.stringify({name:n})});document.getElementById('newSubject').value='';alert('Subject database में save हो गया।');await refreshAdmin()}catch(e){alert(e.message)}}
+function closeAdmin(){localStorage.removeItem('shikshaSession');session=null;document.getElementById('adminPanel').style.display='none';updateAuthUI()}
+window.addEventListener('load',()=>{updateAuthUI();loadLiveTests()});
+</script></body>
+</html>
