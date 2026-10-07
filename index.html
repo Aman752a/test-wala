@@ -363,7 +363,213 @@ async function startSpecificTest(id){try{if(!session){openAuth('signin');alert('
 async function refreshAdmin(){try{const s=await api('/admin/stats');document.querySelectorAll('.stat b')[0].textContent=s.tests;document.querySelectorAll('.stat b')[1].textContent=s.questions;document.querySelectorAll('.stat b')[2].textContent=s.users;document.querySelectorAll('.stat b')[3].textContent=s.results;const [tests,subs]=await Promise.all([api('/admin/tests'),api('/subjects')]);const sub=document.getElementById('newTestSubject');sub.innerHTML=subs.map(x=>`<option value="${x.id}">${escapeHtml(x.name)}</option>`).join('');const aq=document.getElementById('aqTest');aq.innerHTML='<option value="">Select Test</option>'+tests.map(x=>`<option value="${x.id}">${escapeHtml(x.name)}</option>`).join('');document.getElementById('adminTestList').innerHTML=tests.map(x=>`<div class="manager-item"><div><b>${escapeHtml(x.name)}</b><br><small>${escapeHtml(x.subject||'General')} • ${x.time_minutes} min • ${x.questions} questions</small></div></div>`).join('')||'<small>No tests yet.</small>';document.getElementById('testList').innerHTML=document.getElementById('adminTestList').innerHTML;}catch(e){alert(e.message)}}
 async function addQuestion(){try{const q=document.getElementById('aqText').value.trim(),o=['aqA','aqB','aqC','aqD'].map(x=>document.getElementById(x).value.trim()),testId=+document.getElementById('aqTest').value;if(!testId)throw Error('पहले Test select करें।');if(!q||o.some(x=>!x))throw Error('Question और चारों options भरें।');await api('/admin/questions',{method:'POST',body:JSON.stringify({testId,subjectId:null,topic:document.getElementById('aqTopic').value,question:q,a:o[0],b:o[1],c:o[2],d:o[3],correct:+document.getElementById('aqCorrect').value})});alert('Question database में save हो गया।');['aqText','aqA','aqB','aqC','aqD','aqTopic'].forEach(id=>document.getElementById(id).value='');await refreshAdmin();loadLiveTests()}catch(e){alert(e.message)}}
 async function createTest(){try{const n=document.getElementById('newTestName').value.trim(),t=+document.getElementById('newTestTime').value||10,subjectId=+document.getElementById('newTestSubject').value||null;if(!n)throw Error('Test Name डालें।');await api('/admin/tests',{method:'POST',body:JSON.stringify({name:n,subjectId,timeMinutes:t})});document.getElementById('newTestName').value='';alert('Test database में save हो गया।');await refreshAdmin();loadLiveTests()}catch(e){alert(e.message)}}
-async function addSubject(){try{const n=document.getElementById('newSubject').value.trim();if(!n)return;await api('/admin/subjects',{method:'POST',body:JSON.stringify({name:n})});document.getElementById('newSubject').value='';alert('Subject database में save हो गया।');await refreshAdmin()}catch(e){alert(e.message)}}
+async function addSubject(){try{const n=document.getElementById('newSubject').value.trim();if(!n)return;await api('/admin/subjects',{method:'POST',body:JSON.stringify({name:n})});document.getElementById('newSubject').value='';alert('Subject database में save हो गया।');await refreshAdmin()}catch(e){alert(e.message)}} 
+async function loadAdminData(){
+  try{
+    const subjects = await api('/subjects');
+    const tests = await api('/tests');
+
+    const subjectList = Array.isArray(subjects) ? subjects : (subjects.subjects || []);
+    const testList = Array.isArray(tests) ? tests : (tests.tests || []);
+
+    const newSubject = document.getElementById('newTestSubject');
+    if(newSubject){
+      newSubject.innerHTML = '<option value="">Select Subject</option>';
+
+      subjectList.forEach(s=>{
+        const option = document.createElement('option');
+        option.value = s.id;
+        option.textContent = s.name;
+        newSubject.appendChild(option);
+      });
+    }
+
+    const aqTest = document.getElementById('aqTest');
+    if(aqTest){
+      aqTest.innerHTML = '<option value="">Select Test</option>';
+
+      testList.forEach(t=>{
+        const option = document.createElement('option');
+        option.value = t.id;
+        option.textContent = t.name;
+        aqTest.appendChild(option);
+      });
+    }
+
+    const testListBox = document.getElementById('testList');
+    if(testListBox){
+      testListBox.innerHTML = '';
+
+      testList.forEach(t=>{
+        const div = document.createElement('div');
+        div.className = 'manager-item';
+        div.textContent =
+          `${t.name} — ${t.subject || 'No Subject'} — ${t.time_minutes || 10} min`;
+        testListBox.appendChild(div);
+      });
+    }
+
+  }catch(e){
+    console.error('Admin data error:',e);
+  }
+}
+
+async function refreshAdmin(){
+  try{
+    const s = await api('/admin/stats');
+
+    const stats = [
+      s.tests ?? s.totalTests ?? 0,
+      s.questions ?? s.totalQuestions ?? 0,
+      s.students ?? s.totalStudents ?? 0,
+      s.results ?? s.totalResults ?? 0
+    ];
+
+    document.querySelectorAll('.stat b').forEach((el,i)=>{
+      if(stats[i] !== undefined) el.textContent = stats[i];
+    });
+
+    await loadAdminData();
+
+  }catch(e){
+    alert(e.message || 'Dashboard data load नहीं हुआ।');
+  }
+}
+
+async function createTest(){
+  try{
+    const name = document.getElementById('newTestName').value.trim();
+    const subjectId = document.getElementById('newTestSubject').value;
+    const timeMinutes = Number(document.getElementById('newTestTime').value || 10);
+
+    if(!name){
+      alert('Test Name डालें।');
+      return;
+    }
+
+    if(!subjectId){
+      alert('Subject Select करें।');
+      return;
+    }
+
+    await api('/admin/tests',{
+      method:'POST',
+      body:JSON.stringify({
+        name,
+        subjectId:Number(subjectId),
+        timeMinutes
+      })
+    });
+
+    document.getElementById('newTestName').value = '';
+
+    alert('✅ Test successfully created.');
+
+    await refreshAdmin();
+
+  }catch(e){
+    alert(e.message || 'Test create नहीं हुआ।');
+  }
+}
+
+async function addQuestion(){
+  try{
+    const testId = document.getElementById('aqTest').value;
+    const question = document.getElementById('aqText').value.trim();
+
+    const options = ['aqA','aqB','aqC','aqD'].map(id=>
+      document.getElementById(id).value.trim()
+    );
+
+    const correct = document.getElementById('aqCorrect').value;
+
+    if(!testId){
+      alert('पहले Test Select करें।');
+      return;
+    }
+
+    if(!question){
+      alert('Question लिखें।');
+      return;
+    }
+
+    if(options.some(x=>!x)){
+      alert('चारों Options भरें।');
+      return;
+    }
+
+    if(!correct){
+      alert('Correct Answer Select करें।');
+      return;
+    }
+
+    const selectedTest = (await api('/tests/' + testId));
+
+    const subjectId =
+      selectedTest.subject_id ||
+      selectedTest.subjectId ||
+      selectedTest.test?.subject_id ||
+      selectedTest.test?.subjectId;
+
+    if(!subjectId){
+      alert('इस Test का Subject नहीं मिला।');
+      return;
+    }
+
+    await api('/admin/questions',{
+      method:'POST',
+      body:JSON.stringify({
+        testId:Number(testId),
+        subjectId:Number(subjectId),
+        topic:document.getElementById('aqTopic')?.value.trim() || 'General',
+        question,
+        a:options[0],
+        b:options[1],
+        c:options[2],
+        d:options[3],
+        correct
+      })
+    });
+
+    alert('✅ Question successfully added.');
+
+    document.getElementById('aqText').value = '';
+    ['aqA','aqB','aqC','aqD'].forEach(id=>{
+      document.getElementById(id).value = '';
+    });
+
+    await refreshAdmin();
+
+  }catch(e){
+    alert(e.message || 'Question add नहीं हुआ।');
+  }
+}
+
+async function addSubject(){
+  try{
+    const input = document.getElementById('newSubject');
+    const name = input.value.trim();
+
+    if(!name){
+      alert('Subject name डालें।');
+      return;
+    }
+
+    await api('/admin/subjects',{
+      method:'POST',
+      body:JSON.stringify({name})
+    });
+
+    input.value = '';
+
+    alert('✅ Subject successfully added.');
+
+    await refreshAdmin();
+
+  }catch(e){
+    alert(e.message || 'Subject add नहीं हुआ।');
+  }
+}
 function closeAdmin(){localStorage.removeItem('shikshaSession');session=null;document.getElementById('adminPanel').style.display='none';updateAuthUI()}
 window.addEventListener('load',()=>{updateAuthUI();loadLiveTests()});
 </script></body>
