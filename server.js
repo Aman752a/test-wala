@@ -84,11 +84,11 @@ CREATE TABLE IF NOT EXISTS results (
    OWNER
 ========================= */
 
-const owner = db
+const ownerUser = db
   .prepare("SELECT id FROM users WHERE email = ?")
   .get(OWNER_EMAIL);
 
-if (!owner) {
+if (!ownerUser) {
   const hash = bcrypt.hashSync(OWNER_PASSWORD, 10);
 
   db.prepare(`
