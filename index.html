@@ -571,6 +571,10 @@ async function addSubject(){
   }
 }
 function closeAdmin(){localStorage.removeItem('shikshaSession');session=null;document.getElementById('adminPanel').style.display='none';updateAuthUI()}
-window.addEventListener('load',()=>{updateAuthUI();loadLiveTests()});
+window.addEventListener('load',async()=>{
+  updateAuthUI();
+  await loadLiveTests();
+  await loadAdminData();
+});
 </script></body>
 </html>
